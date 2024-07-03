@@ -1,0 +1,34 @@
+{
+	"folders": [
+		{
+			"path": "../../../../vite"
+		},
+		{
+			"path": "../../../../StronaJS"
+		},
+		{
+			"path": "../../../../JS"
+		},
+		{
+			"path": "C:/Users/Krystian/Desktop/Crud Basic"
+		},
+		{
+			"path": "C:/Users/Krystian/Desktop/Native"
+		},
+		{
+			"path": "../../../../projektNative"
+		},
+		{
+			"path": "../../../../ReactNative"
+		},
+		{
+			"path": "C:/Users/Krystian/Desktop/typescript_tutorial"
+		},
+		{
+			"path": "../../.."
+		}
+	],
+	"settings": {
+		"liveServer.settings.multiRootWorkspaceName": "JS"
+	}
+}
