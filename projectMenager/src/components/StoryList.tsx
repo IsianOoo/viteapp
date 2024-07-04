@@ -7,7 +7,7 @@ interface StoryListProps {
   onDelete: (id: string) => void;
 }
 
-// Typy dla statusów historyjek
+
 type StoryStatus = 'todo' | 'doing' | 'done';
 
 const StoryList: React.FC<StoryListProps> = ({ stories, onEdit, onDelete }) => {

@@ -1,7 +1,9 @@
 import { User } from '../models/User'
+import {v4 as uuidv4} from 'uuid';
 
 class UserService {
-	private static readonly STORAGE_KEY = 'loggedInUser'
+	private static USERS_KEY = 'users'
+	private static  STORAGE_KEY = 'loggedInUser'
 
 	static getLoggedInUser(): User | null {
 		const user = localStorage.getItem(this.STORAGE_KEY)
@@ -17,6 +19,7 @@ class UserService {
 			id: '1',
 			firstName: 'John',
 			lastName: 'Doe',
+			role:'admin'
 		}
         this.setLoggedInUser(mockUser);
 	}
