@@ -21,7 +21,7 @@ const App: React.FC = () => {
   const [currentStory, setCurrentStory] = useState<Story | undefined>(undefined);
 
   useEffect(() => {
-    UserService.mockLoggedInUser();
+    UserService.mockUsers();
     setProjects(ProjectService.getAllProject());
     const activeProject = ActiveProjectService.getActiveProject();
     if (activeProject) {
