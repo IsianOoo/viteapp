@@ -7,8 +7,8 @@ export interface Task{
     estimatedTime:number
     status:'todo'|'doing'|'done'
     createdAt:string
-    startAt:string
-    endAt:string
-    assignedUserId:string
+    startAt?:string
+    endAt?:string
+    assignedUserId?:string
 
 }
