@@ -9,6 +9,12 @@ class ProjectUserService{
         return projects? JSON.parse(projects):[];
     }
 
+    static getProjectById(id: string): Project | undefined {
+        const projects = this.getAllProject();
+        return projects.find(project => project.id === id);
+      }
+    
+
     static saveProject(project:Project):void{
         const projects = this.getAllProject();
         project.id = uuidv4();

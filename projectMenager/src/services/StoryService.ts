@@ -8,7 +8,11 @@ class StoryService{
         const stories = localStorage.getItem(this.STORAGE_KEY)
         return stories? JSON.parse(stories):[]
     }
-
+    static getStoryById(id: string): Story | undefined {
+        const stories = this.getAllStories();
+        return stories.find(story => story.id === id);
+      }
+    
     static saveStories(story:Story):void{
      const stories = this.getAllStories()
      story.id = uuidv4()

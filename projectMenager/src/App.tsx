@@ -10,6 +10,11 @@ import StoryService from './services/StoryService';
 import ActiveProjectService from './services/ActiveProjectService';
 import StoryForm from './components/StoryForm';
 import StoryList from './components/StoryList';
+import TaskService from './services/TaskService';
+import { Task } from './models/Task';
+import TaskList from './components/TaskList';
+import TaskForm from './components/TaskForm';
+import Table from './components/Table';
 
 
 
@@ -19,6 +24,9 @@ const App: React.FC = () => {
   const [currentProject, setCurrentProject] = useState<Project | undefined>(undefined);
   const [stories, setStories] = useState<Story[]>([]);
   const [currentStory, setCurrentStory] = useState<Story | undefined>(undefined);
+  const [tasks, setTasks] = useState<Task[]>([])
+	const [currentTask, setCurrentTask] = useState<Task | undefined>(undefined)
+
 
   useEffect(() => {
     UserService.mockUsers();
@@ -57,6 +65,11 @@ const App: React.FC = () => {
     setCurrentProject(project);
     setStories(StoryService.getAllStories().filter(story => story.projectId === project.id));
   };
+  
+	const handleSelectStory = (story: Story) => {
+		setCurrentStory(story)
+		setTasks(TaskService.getAllTasks().filter((task) => task.storyId === story.id))
+	}
   const handleSaveStory = (story: Story) => {
     if (story.id === '') {
       StoryService.saveStories(story);
@@ -76,6 +89,42 @@ const App: React.FC = () => {
     setStories(StoryService.getAllStories().filter(story => story.projectId === (currentProject ? currentProject.id : '')));
   };
 
+  const handleSaveTask = (task: Task) => {
+		if (task.id === '') {
+			TaskService.saveTask(task)
+		} else {
+			TaskService.updateTask(task)
+		}
+		setTasks(TaskService.getAllTasks().filter((t) => t.storyId === (currentStory ? currentStory.id : '')))
+		setCurrentTask(undefined)
+	}
+
+	const handleEditTask = (task: Task) => {
+		setCurrentTask(task)
+	}
+
+	const handleDeleteTask = (id: string) => {
+		TaskService.deleteTask(id)
+		setTasks(TaskService.getAllTasks().filter((task) => task.storyId === (currentStory ? currentStory.id : '')))
+	}
+
+	const handleUpdateTask = (task: Task) => {
+		TaskService.updateTask(task)
+		setTasks(TaskService.getAllTasks().filter((t) => t.storyId === (currentStory ? currentStory.id : '')))
+	}
+
+	const handleAssignUser = (taskId: string, userId: string) => {
+		const updatedTask = TaskService.assignUser(taskId, userId)
+		if (updatedTask.status === 'todo') {
+			updatedTask.status = 'doing'
+			TaskService.updateTask(updatedTask)
+			setTasks((prevTasks) => prevTasks.map((t) => (t.id === updatedTask.id ? updatedTask : t)))
+		} else {
+			TaskService.updateTask(updatedTask)
+			setTasks((prevTasks) => prevTasks.map((t) => (t.id === updatedTask.id ? updatedTask : t)))
+		}
+	}
+
   return (
     <div>
       <h1>Project Manager</h1>
@@ -85,9 +134,31 @@ const App: React.FC = () => {
         <>
           <h2>Stories for {currentProject.name}</h2>
           <StoryForm story={currentStory} onSave={handleSaveStory} projectId={currentProject.id} />
-          <StoryList stories={stories} onEdit={handleEditStory} onDelete={handleDeleteStory} />
+          <StoryList stories={stories} onEdit={handleEditStory} onDelete={handleDeleteStory} onSelect={handleSelectStory} />
         </>
       )}
+      {currentStory && (
+				<>
+					<h2>Kanban Board for {currentStory.name}</h2>
+					<Table
+						tasks={tasks}
+						onEdit={handleEditTask}
+						onDelete={handleDeleteTask}
+						onUpdate={handleUpdateTask}
+						onAssignUser={handleAssignUser}
+						storyId={currentStory.id}
+					/>
+					<h2>Tasks for {currentStory.name}</h2>
+					<TaskForm task={currentTask} onSave={handleSaveTask} storyId={currentStory.id} />
+					<TaskList
+						tasks={tasks}
+						onEdit={handleEditTask}
+						onDelete={handleDeleteTask}
+						onUpdate={handleUpdateTask}
+						storyId={currentStory.id}
+					/>
+				</>
+			)}
     </div>
   );
 };

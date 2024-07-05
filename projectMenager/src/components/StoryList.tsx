@@ -5,12 +5,13 @@ interface StoryListProps {
   stories: Story[];
   onEdit: (story: Story) => void;
   onDelete: (id: string) => void;
+  onSelect: (story: Story) => void
 }
 
 
 type StoryStatus = 'todo' | 'doing' | 'done';
 
-const StoryList: React.FC<StoryListProps> = ({ stories, onEdit, onDelete }) => {
+const StoryList: React.FC<StoryListProps> = ({ stories, onEdit, onDelete,onSelect }) => {
   const filteredStories: { [key in StoryStatus]: Story[] } = {
     todo: stories.filter(story => story.status === 'todo'),
     doing: stories.filter(story => story.status === 'doing'),
@@ -33,6 +34,7 @@ const StoryList: React.FC<StoryListProps> = ({ stories, onEdit, onDelete }) => {
                 <p>Owner ID: {story.ownerId}</p>
                 <button onClick={() => onEdit(story)}>Edit</button>
                 <button onClick={() => onDelete(story.id)}>Delete</button>
+                <button onClick={() => onSelect(story)}>Show Tasks</button>
               </li>
             ))}
           </ul>
