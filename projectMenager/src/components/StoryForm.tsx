@@ -45,22 +45,24 @@ const StoryForm: React.FC<StoryFormProps> = ({ story, onSave, projectId }) => {
   }, [story]);
 
   return (
-    <form onSubmit={handleSubmit}>
-      <div>
-        <label>Name</label>
-        <input
+    <form className='bg-gray-900 p-10  ' onSubmit={handleSubmit}>
+      <div className='grid gap-y-4'>
+      <div >
+        <label className='block text-sm font-bold ml-1 mb-2 text-white'>Name</label>
+        <input className='py-3 px-4 block w-full border-2 border-gray-600 rounded-md text-sm shadow-sm text-white bg-gray-800'
           type="text"
           value={name}
           onChange={(e) => setName(e.target.value)}
         />
       </div>
-      <div>
-        <label>Description</label>
-        <input
+      <div className='my-5'>
+        <label className='block text-sm font-bold ml-1 mb-2 text-white'>Description</label>
+        <input className='py-3 px-4 block w-full border-2 border-gray-600 rounded-md text-sm shadow-sm text-white bg-gray-800'
           type="text"
           value={description}
           onChange={(e) => setDescription(e.target.value)}
         />
+      </div>
       </div>
       <div>
         <label>Priority</label>
