@@ -13,9 +13,9 @@ interface TableProps {
 
 const Table: React.FC<TableProps> = ({ tasks, onEdit, onDelete, onUpdate, storyId }) => {
   return (
-    <div className='grid-cols-3 grid col-auto'>
-      <div>
-        <h3>Todo</h3>
+    <div className='grid-cols-3 grid col-auto text-white'>
+      <div className=''>
+        <h3 className='uppercase font-bold mt-5 rounded-lg bg-gray-900 p-5 text-white mb-1 mx-2' >Todo</h3>
         <TaskList
           tasks={tasks.filter((task) => task.status === 'todo')}
           onEdit={onEdit}
@@ -25,7 +25,7 @@ const Table: React.FC<TableProps> = ({ tasks, onEdit, onDelete, onUpdate, storyI
         />
       </div>
       <div>
-        <h3>Doing</h3>
+        <h3 className='uppercase font-bold mt-5 rounded-lg bg-gray-900 p-5 text-white mb-1 mx-2'>Doing</h3>
         <TaskList
           tasks={tasks.filter((task) => task.status === 'doing')}
           onEdit={onEdit}
@@ -35,7 +35,7 @@ const Table: React.FC<TableProps> = ({ tasks, onEdit, onDelete, onUpdate, storyI
         />
       </div>
       <div>
-        <h3>Done</h3>
+        <h3 className='uppercase font-bold mt-5 rounded-lg bg-gray-900 p-5 text-white mb-1 mx-2'>Done</h3>
         <TaskList
           tasks={tasks.filter((task) => task.status === 'done')}
           onEdit={onEdit}

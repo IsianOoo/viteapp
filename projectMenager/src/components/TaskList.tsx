@@ -29,11 +29,11 @@ const TaskList: React.FC<TaskListProps> = ({ tasks, onUpdate, onDelete, storyId 
       {tasks.length === 0 ? (
         <p>No tasks available.</p>
       ) : (
-        <ul>
+        <ul className=' text-surface shadow-secondary-1 dark:bg-surface-dark dark:text-white'>
           {tasks.map(task => (
-            <li key={task.id}>
+            <li key={task.id} className='w-full border-b-2 border-neutral-100 py-4 dark:border-white/10'>
               <div>
-                <h3>{task.name}</h3>
+                <h3 className='mb-2 text-xl font-medium leading-tight'>{task.name}</h3>
                 <p>{task.description}</p>
                 <p>Priority: {task.priority}</p>
                 <p>Estimated Time: {task.estimatedTime} hours</p>

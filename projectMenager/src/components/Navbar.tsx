@@ -1,7 +1,10 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import ActiveProjectService from '../services/ActiveProjectService';
 
 const Navbar: React.FC = () => {
+  const activeProject = ActiveProjectService.getActiveProject();
+
   return (
     <nav className="bg-gray-800">
       <div className="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
@@ -48,7 +51,7 @@ const Navbar: React.FC = () => {
                   Projekt
                 </Link>
                 <Link
-                  to="/zadania"
+                  to={activeProject ? `/zadania/${activeProject.id}` : "/projekty"}
                   className="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white"
                 >
                   Zadania
@@ -68,7 +71,7 @@ const Navbar: React.FC = () => {
             Projekt
           </Link>
           <Link
-            to="/zadania"
+            to={activeProject ? `/zadania/${activeProject.id}` : "/projekty"}
             className="block rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white"
           >
             Zadania

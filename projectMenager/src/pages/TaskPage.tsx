@@ -8,6 +8,7 @@ import StoryService from '../services/StoryService';
 import TaskService from '../services/TaskService';
 import { Story } from '../models/Story';
 import { Task } from '../models/Task';
+import TaskList from '../components/TaskList';
 
 const TaskPage: React.FC = () => {
   const { projectId } = useParams<{ projectId: string }>();
@@ -21,11 +22,6 @@ const TaskPage: React.FC = () => {
       setStories(StoryService.getAllStories().filter(story => story.projectId === projectId));
     }
   }, [projectId]);
-
-  const handleSelectStory = (story: Story) => {
-    setCurrentStory(story);
-    setTasks(TaskService.getAllTasks().filter(task => task.storyId === story.id));
-  };
 
   const handleSaveStory = (story: Story) => {
     if (story.id === '') {
@@ -46,13 +42,18 @@ const TaskPage: React.FC = () => {
     setStories(StoryService.getAllStories().filter(story => story.projectId === projectId));
   };
 
+  const handleSelectStory = (story: Story) => {
+    setCurrentStory(story);
+    setTasks(TaskService.getAllTasks().filter((task) => task.storyId === story.id));
+  };
+
   const handleSaveTask = (task: Task) => {
     if (task.id === '') {
       TaskService.saveTask(task);
     } else {
       TaskService.updateTask(task);
     }
-    setTasks(TaskService.getAllTasks().filter(t => t.storyId === (currentStory ? currentStory.id : '')));
+    setTasks(TaskService.getAllTasks().filter((t) => t.storyId === currentStory?.id));
     setCurrentTask(undefined);
   };
 
@@ -62,12 +63,12 @@ const TaskPage: React.FC = () => {
 
   const handleDeleteTask = (id: string) => {
     TaskService.deleteTask(id);
-    setTasks(tasks.filter(task => task.id !== id));
+    setTasks(tasks.filter((task) => task.id !== id));
   };
 
   const handleUpdateTask = (task: Task) => {
     TaskService.updateTask(task);
-    setTasks(TaskService.getAllTasks().filter(t => t.storyId === (currentStory ? currentStory.id : '')));
+    setTasks(TaskService.getAllTasks().filter((t) => t.storyId === currentStory?.id));
   };
 
   const handleAssignUser = (taskId: string, userId: string) => {
@@ -75,10 +76,10 @@ const TaskPage: React.FC = () => {
     if (updatedTask.status === 'todo') {
       updatedTask.status = 'doing';
       TaskService.updateTask(updatedTask);
-      setTasks(prevTasks => prevTasks.map(t => (t.id === updatedTask.id ? updatedTask : t)));
+      setTasks((prevTasks) => prevTasks.map((t) => (t.id === updatedTask.id ? updatedTask : t)));
     } else {
       TaskService.updateTask(updatedTask);
-      setTasks(prevTasks => prevTasks.map(t => (t.id === updatedTask.id ? updatedTask : t)));
+      setTasks((prevTasks) => prevTasks.map((t) => (t.id === updatedTask.id ? updatedTask : t)));
     }
   };
 
@@ -98,12 +99,14 @@ const TaskPage: React.FC = () => {
             storyId={currentStory.id}
           />
           <h2>Tasks for {currentStory.name}</h2>
-          <button onClick={() => setCurrentTask({ id: '', name: '', description: '', priority: 'low', storyId: currentStory.id, estimatedTime: 0, status: 'todo', createdAt: new Date().toISOString() })}>
-            Add Task
-          </button>
-          {currentTask && (
-            <TaskForm task={currentTask} onSave={handleSaveTask} storyId={currentStory.id} />
-          )}
+          <TaskForm task={currentTask} onSave={handleSaveTask} storyId={currentStory.id} />
+          {/* <TaskList
+            tasks={tasks}
+            onEdit={handleEditTask}
+            onDelete={handleDeleteTask}
+            onUpdate={handleUpdateTask}
+            storyId={currentStory.id}
+          /> */}
         </>
       )}
     </div>
