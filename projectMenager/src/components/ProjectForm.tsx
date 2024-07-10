@@ -26,7 +26,7 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ project, onSave }) => {
 	return (
 		<>
 		<form onSubmit={handleSubmit}>
-		<div className='block rounded-lg bg-gray-900 p-6 text-surface shadow-secondary-1 dark:bg-surface-dark dark:text-white'>
+		<div className='block rounded-lg bg-gray-900 p-6 text-surface shadow-secondary-1 dark:bg-surface-dark dark:text-white mt-5'>
 		<h5 className="mb-2 text-xl font-medium leading-tight">Stwórz Projekt</h5>
 		<div>
 			<label className='block text-sm font-medium leading-6'>Name</label>

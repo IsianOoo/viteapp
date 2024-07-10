@@ -27,10 +27,10 @@ class TaskService {
 	}
 
 	static deleteTask(id: string): void {
-		let tasks = this.getAllTasks()
-		tasks.filter((task) => task.id !== id)
-		localStorage.setItem(this.TASKS_KEY, JSON.stringify(tasks))
-	}
+		let tasks = this.getAllTasks();
+		tasks = tasks.filter((task) => task.id !== id);
+		localStorage.setItem(this.TASKS_KEY, JSON.stringify(tasks));
+	  }
 	static getTaskById(id: string): Task | undefined {
 		const tasks = this.getAllTasks()
 		return tasks.find((task) => task.id === id)

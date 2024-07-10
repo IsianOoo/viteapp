@@ -17,6 +17,7 @@ import TaskForm from './components/TaskForm';
 import Table from './components/Table';
 import LoginForm from './components/LoginForm';
 import { User } from './models/User';
+import Navbar from './components/Navbar';
 
 
 
@@ -107,9 +108,9 @@ const App: React.FC = () => {
 	}
 
 	const handleDeleteTask = (id: string) => {
-		TaskService.deleteTask(id)
-		setTasks(TaskService.getAllTasks().filter((task) => task.storyId === (currentStory ? currentStory.id : '')))
-	}
+		TaskService.deleteTask(id);
+		setTasks(tasks.filter((task) => task.id !== id));
+	  };
 
 	const handleUpdateTask = (task: Task) => {
 		TaskService.updateTask(task)
@@ -139,8 +140,9 @@ const App: React.FC = () => {
 		setLoggedInUser(null)
 	}
 
-  return (
-    <div>
+  return (<>
+  <Navbar/>
+  <div>
 			
 			{loggedInUser ? ( 
 				<div>
@@ -191,6 +193,8 @@ const App: React.FC = () => {
 				<LoginForm onLogin={handleLogin} />
 			)}
 		</div>
+		</>
+    
   );
 };
 

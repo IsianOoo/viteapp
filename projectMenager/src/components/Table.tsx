@@ -13,8 +13,8 @@ interface TableProps {
 
 const Table: React.FC<TableProps> = ({ tasks, onEdit, onDelete, onUpdate, storyId }) => {
 	return (
-		<div style={{ display: 'flex' }}>
-			<div style={{ flex: 1 }}>
+		<div className='grid-cols-3 grid col-auto' >
+			<div  >
 				<h3>Todo</h3>
 				<TaskList
 					tasks={tasks.filter((task) => task.status === 'todo')}
@@ -24,7 +24,7 @@ const Table: React.FC<TableProps> = ({ tasks, onEdit, onDelete, onUpdate, storyI
 					storyId={storyId}
 				/>
 			</div>
-			<div style={{ flex: 1 }}>
+			<div >
 				<h3>Doing</h3>
 				<TaskList
 					tasks={tasks.filter((task) => task.status === 'doing')}
@@ -34,7 +34,7 @@ const Table: React.FC<TableProps> = ({ tasks, onEdit, onDelete, onUpdate, storyI
 					storyId={storyId}
 				/>
 			</div>
-			<div style={{ flex: 1 }}>
+			<div  >
 				<h3>Done</h3>
 				<TaskList
 					tasks={tasks.filter((task) => task.status === 'done')}

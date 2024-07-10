@@ -10,9 +10,9 @@ interface ProjectListProps{
 
 const ProjectList: React.FC<ProjectListProps> = ({projects,onEdit,onDelete,onSelect})=>{
     return(
-        <div>
+        <div className="">
       <h2 className="my-5 font-bold uppercase">Projects</h2>
-      <ul className="rounded-lg bg-gray-900 p-6 text-surface shadow-secondary-1 dark:bg-surface-dark dark:text-white ">
+      <ul className=" rounded-lg bg-gray-900 p-6 text-surface shadow-secondary-1 dark:bg-surface-dark dark:text-white ">
         {projects.map(project => (
           <li className="w-full border-b-2 border-neutral-100 py-4 dark:border-white/10" key={project.id}>
             <h3 className="mb-2 text-xl font-medium leading-tight">{project.name}</h3>
