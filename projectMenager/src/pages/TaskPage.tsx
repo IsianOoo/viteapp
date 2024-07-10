@@ -4,11 +4,11 @@ import StoryForm from '../components/StoryForm';
 import StoryList from '../components/StoryList';
 import Table from '../components/Table';
 import TaskForm from '../components/TaskForm';
+import TaskList from '../components/TaskList';
 import StoryService from '../services/StoryService';
 import TaskService from '../services/TaskService';
 import { Story } from '../models/Story';
 import { Task } from '../models/Task';
-import TaskList from '../components/TaskList';
 
 const TaskPage: React.FC = () => {
   const { projectId } = useParams<{ projectId: string }>();
@@ -16,6 +16,7 @@ const TaskPage: React.FC = () => {
   const [currentStory, setCurrentStory] = useState<Story | undefined>(undefined);
   const [tasks, setTasks] = useState<Task[]>([]);
   const [currentTask, setCurrentTask] = useState<Task | undefined>(undefined);
+  const [showTaskForm, setShowTaskForm] = useState<boolean>(false);
 
   useEffect(() => {
     if (projectId) {
@@ -55,10 +56,12 @@ const TaskPage: React.FC = () => {
     }
     setTasks(TaskService.getAllTasks().filter((t) => t.storyId === currentStory?.id));
     setCurrentTask(undefined);
+    setShowTaskForm(false);
   };
 
   const handleEditTask = (task: Task) => {
     setCurrentTask(task);
+    setShowTaskForm(true);
   };
 
   const handleDeleteTask = (id: string) => {
@@ -86,10 +89,15 @@ const TaskPage: React.FC = () => {
   return (
     <div>
       <StoryForm story={currentStory} onSave={handleSaveStory} projectId={projectId!} />
-      <StoryList stories={stories} onEdit={handleEditStory} onDelete={handleDeleteStory} onSelect={handleSelectStory} />
+      <StoryList
+        stories={stories}
+        onEdit={handleEditStory}
+        onDelete={handleDeleteStory}
+        onSelect={handleSelectStory}
+      />
       {currentStory && (
         <>
-          <h2>Kanban Board for {currentStory.name}</h2>
+          <h2 className='my-2 text-xl font-medium leading-tight dark:text-white'>Zadania dla {currentStory.name}</h2>
           <Table
             tasks={tasks}
             onEdit={handleEditTask}
@@ -98,15 +106,21 @@ const TaskPage: React.FC = () => {
             onAssignUser={handleAssignUser}
             storyId={currentStory.id}
           />
-          <h2>Tasks for {currentStory.name}</h2>
-          <TaskForm task={currentTask} onSave={handleSaveTask} storyId={currentStory.id} />
-          {/* <TaskList
-            tasks={tasks}
-            onEdit={handleEditTask}
-            onDelete={handleDeleteTask}
-            onUpdate={handleUpdateTask}
-            storyId={currentStory.id}
-          /> */}
+          
+          <button
+            onClick={() => setShowTaskForm(true)}
+            className="mt-4 bg-indigo-600 text-white px-4 py-2 rounded"
+          >
+            Add Task
+          </button>
+          {showTaskForm && (
+            <TaskForm
+              task={currentTask}
+              onSave={handleSaveTask}
+              storyId={currentStory.id}
+              onClose={() => setShowTaskForm(false)}
+            />
+          )}
         </>
       )}
     </div>

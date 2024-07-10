@@ -1,4 +1,3 @@
-// TaskList.tsx
 import React from 'react';
 import { Task } from '../models/Task';
 import TaskForm from './TaskForm';
@@ -13,32 +12,35 @@ interface TaskListProps {
 
 const TaskList: React.FC<TaskListProps> = ({ tasks, onUpdate, onDelete, storyId }) => {
   const [editingTask, setEditingTask] = React.useState<Task | null>(null);
+  const [showTaskForm, setShowTaskForm] = React.useState<boolean>(false);
 
   const handleEdit = (task: Task) => {
     setEditingTask(task);
+    setShowTaskForm(true);
   };
 
   const handleSave = (task: Task) => {
     onUpdate(task);
     setEditingTask(null);
+    setShowTaskForm(false);
   };
 
   return (
-    <div className='bg-gray-900 p-10 rounded-lg m-2 '>
+    <div>
       <h2>Task List</h2>
       {tasks.length === 0 ? (
         <p>No tasks available.</p>
       ) : (
-        <ul className=' text-surface shadow-secondary-1 dark:bg-surface-dark dark:text-white'>
-          {tasks.map(task => (
-            <li key={task.id} className='w-full border-b-2 border-neutral-100 py-4 dark:border-white/10'>
+        <ul className='rounded-lg bg-gray-900 text-surface shadow-secondary-1 dark:bg-surface-dark dark:text-white mx-2'>
+          {tasks.map((task) => (
+            <li className='w-full border-b-2 border-neutral-100 py-4 dark:border-white/10' key={task.id}>
               <div>
-                <h3 className='mb-2 text-xl font-medium leading-tight'>{task.name}</h3>
-                <p>{task.description}</p>
-                <p>Priority: {task.priority}</p>
-                <p>Estimated Time: {task.estimatedTime} hours</p>
-                <p>Status: {task.status}</p>
-                <p>Assigned User: {task.assignedUserId}</p>
+                <h3 className='mb-2 text-xl font-medium leading-tight' >{task.name}</h3>
+                <p className='mb-4 text-base'>{task.description}</p>
+                <p className='mb-4 text-base'>Priority: {task.priority}</p>
+                <p className='mb-4 text-base'>Estimated Time: {task.estimatedTime} hours</p>
+                <p className='mb-4 text-base'>Status: {task.status}</p>
+                <p className='mb-4 text-base'>Assigned User: {task.assignedUserId}</p>
                 <button onClick={() => handleEdit(task)}>Edit</button>
                 <button onClick={() => onDelete(task.id)}>Delete</button>
               </div>
@@ -46,11 +48,13 @@ const TaskList: React.FC<TaskListProps> = ({ tasks, onUpdate, onDelete, storyId 
           ))}
         </ul>
       )}
-      {editingTask && (
-        <div>
-          <h2>Edit Task</h2>
-          <TaskForm task={editingTask} onSave={handleSave} storyId={storyId} />
-        </div>
+      {showTaskForm && editingTask && (
+        <TaskForm
+          task={editingTask}
+          onSave={handleSave}
+          storyId={storyId}
+          onClose={() => setShowTaskForm(false)}
+        />
       )}
     </div>
   );

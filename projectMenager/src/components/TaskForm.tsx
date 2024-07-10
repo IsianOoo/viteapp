@@ -7,9 +7,10 @@ interface TaskFormProps {
   task?: Task;
   onSave: (task: Task) => void;
   storyId: string;
+  onClose: () => void; // Dodaj tę właściwość
 }
 
-const TaskForm: React.FC<TaskFormProps> = ({ task, onSave, storyId }) => {
+const TaskForm: React.FC<TaskFormProps> = ({ task, onSave, storyId, onClose }) => {
   const [name, setName] = useState<string>(task ? task.name : '');
   const [description, setDescription] = useState<string>(task ? task.description : '');
   const [priority, setPriority] = useState<'low' | 'medium' | 'high'>(task ? task.priority : 'low');
@@ -21,7 +22,7 @@ const TaskForm: React.FC<TaskFormProps> = ({ task, onSave, storyId }) => {
   useEffect(() => {
     const fetchUsers = async () => {
       const allUsers = UserService.getAllUsers();
-      const filteredUsers = allUsers.filter(user => user.role !== 'admin');
+      const filteredUsers = allUsers.filter((user) => user.role !== 'admin');
       setUsers(filteredUsers);
     };
     fetchUsers();
@@ -62,51 +63,88 @@ const TaskForm: React.FC<TaskFormProps> = ({ task, onSave, storyId }) => {
     setEstimatedTime(0);
     setStatus('todo');
     setAssignedUserId(undefined);
+    onClose(); 
   };
 
   return (
-    <form className='bg-gray-900 p-10 rounded-lg ' onSubmit={handleSubmit}>
-      <div>
-        <label>Name</label>
-        <input type="text" value={name} onChange={e => setName(e.target.value)} required />
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center text-black">
+      <div className="bg-white p-6 rounded-lg shadow-lg w-96">
+        <form onSubmit={handleSubmit}>
+          <div>
+            <label className="block text-sm font-bold mb-2">Name</label>
+            <input
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
+              className="w-full p-2 border rounded"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-bold mb-2">Description</label>
+            <input
+              type="text"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              required
+              className="w-full p-2 border rounded"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-bold mb-2">Priority</label>
+            <select
+              value={priority}
+              onChange={(e) => setPriority(e.target.value as 'low' | 'medium' | 'high')}
+              className="w-full p-2 border rounded"
+            >
+              <option value="low">Low</option>
+              <option value="medium">Medium</option>
+              <option value="high">High</option>
+            </select>
+          </div>
+          <div>
+            <label className="block text-sm font-bold mb-2">Estimated Time</label>
+            <input
+              type="number"
+              value={estimatedTime}
+              onChange={(e) => setEstimatedTime(parseFloat(e.target.value))}
+              className="w-full p-2 border rounded"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-bold mb-2">Status</label>
+            <select
+              value={status}
+              onChange={(e) => setStatus(e.target.value as 'todo' | 'doing' | 'done')}
+              className="w-full p-2 border rounded"
+            >
+              <option value="todo">To Do</option>
+              <option value="doing">Doing</option>
+              <option value="done">Done</option>
+            </select>
+          </div>
+          <div>
+            <label className="block text-sm font-bold mb-2">Assign User</label>
+            <select
+              value={assignedUserId || ''}
+              onChange={(e) => setAssignedUserId(e.target.value)}
+              className="w-full p-2 border rounded"
+            >
+              <option value="">Select User</option>
+              {users.map((user) => (
+                <option key={user.id} value={user.id}>
+                  {user.firstName} {user.lastName}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="flex justify-end mt-4">
+            <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded mr-2">Save</button>
+            <button type="button" onClick={onClose} className="bg-gray-500 text-white px-4 py-2 rounded">Close</button>
+          </div>
+        </form>
       </div>
-      <div>
-        <label>Description</label>
-        <input type="text" value={description} onChange={e => setDescription(e.target.value)} required />
-      </div>
-      <div>
-        <label>Priority</label>
-        <select value={priority} onChange={e => setPriority(e.target.value as 'low' | 'medium' | 'high')}>
-          <option value="low">Low</option>
-          <option value="medium">Medium</option>
-          <option value="high">High</option>
-        </select>
-      </div>
-      <div>
-        <label>Estimated Time</label>
-        <input type="number" value={estimatedTime} onChange={e => setEstimatedTime(parseFloat(e.target.value))} />
-      </div>
-      <div>
-        <label>Status</label>
-        <select value={status} onChange={e => setStatus(e.target.value as 'todo' | 'doing' | 'done')}>
-          <option value="todo">To Do</option>
-          <option value="doing">Doing</option>
-          <option value="done">Done</option>
-        </select>
-      </div>
-      <div>
-        <label>Assign User</label>
-        <select value={assignedUserId || ''} onChange={e => setAssignedUserId(e.target.value)}>
-          <option value="">Select User</option>
-          {users.map(user => (
-            <option key={user.id} value={user.id}>
-              {user.firstName} {user.lastName}
-            </option>
-          ))}
-        </select>
-      </div>
-      <button type="submit">Save</button>
-    </form>
+    </div>
   );
 };
 
