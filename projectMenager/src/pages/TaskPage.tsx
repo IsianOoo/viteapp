@@ -1,14 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import StoryForm from '../components/StoryForm';
-import StoryList from '../components/StoryList';
-import Table from '../components/Table';
-import TaskForm from '../components/TaskForm';
-import TaskList from '../components/TaskList';
 import StoryService from '../services/StoryService';
 import TaskService from '../services/TaskService';
 import { Story } from '../models/Story';
 import { Task } from '../models/Task';
+import StoryForm from '../components/StoryForm';
+import StoryList from '../components/StoryList';
+import Table from '../components/Table';
+import TaskForm from '../components/TaskForm';
 
 const TaskPage: React.FC = () => {
   const { projectId } = useParams<{ projectId: string }>();
@@ -16,21 +15,27 @@ const TaskPage: React.FC = () => {
   const [currentStory, setCurrentStory] = useState<Story | undefined>(undefined);
   const [tasks, setTasks] = useState<Task[]>([]);
   const [currentTask, setCurrentTask] = useState<Task | undefined>(undefined);
-  const [showTaskForm, setShowTaskForm] = useState<boolean>(false);
 
   useEffect(() => {
-    if (projectId) {
-      setStories(StoryService.getAllStories().filter(story => story.projectId === projectId));
-    }
+    const fetchStories = async () => {
+      if (projectId) {
+        const stories = await StoryService.getStoriesByProjectId(projectId);
+        setStories(stories);
+      }
+    };
+    fetchStories();
   }, [projectId]);
 
-  const handleSaveStory = (story: Story) => {
+  const handleSaveStory = async (story: Story) => {
     if (story.id === '') {
-      StoryService.saveStories(story);
+      await StoryService.saveStory(story);
     } else {
-      StoryService.updateStory(story);
+      await StoryService.updateStory(story);
     }
-    setStories(StoryService.getAllStories().filter(s => s.projectId === projectId));
+    if (projectId) {
+      const stories = await StoryService.getStoriesByProjectId(projectId);
+      setStories(stories);
+    }
     setCurrentStory(undefined);
   };
 
@@ -38,51 +43,63 @@ const TaskPage: React.FC = () => {
     setCurrentStory(story);
   };
 
-  const handleDeleteStory = (id: string) => {
-    StoryService.daleteStory(id);
-    setStories(StoryService.getAllStories().filter(story => story.projectId === projectId));
-  };
-
-  const handleSelectStory = (story: Story) => {
-    setCurrentStory(story);
-    setTasks(TaskService.getAllTasks().filter((task) => task.storyId === story.id));
-  };
-
-  const handleSaveTask = (task: Task) => {
-    if (task.id === '') {
-      TaskService.saveTask(task);
-    } else {
-      TaskService.updateTask(task);
+  const handleDeleteStory = async (id: string) => {
+    await StoryService.deleteStory(id);
+    if (projectId) {
+      const stories = await StoryService.getStoriesByProjectId(projectId);
+      setStories(stories);
     }
-    setTasks(TaskService.getAllTasks().filter((t) => t.storyId === currentStory?.id));
+  };
+
+  const handleSelectStory = async (story: Story) => {
+    setCurrentStory(story);
+    const tasks = await TaskService.getAllTasksByStoryId(story.id);
+    setTasks(tasks);
+  };
+
+  const handleSaveTask = async (task: Task) => {
+    if (task.id === '') {
+      await TaskService.saveTask(task);
+    } else {
+      await TaskService.updateTask(task);
+    }
+    if (currentStory) {
+      const tasks = await TaskService.getAllTasksByStoryId(currentStory.id);
+      setTasks(tasks);
+    }
     setCurrentTask(undefined);
-    setShowTaskForm(false);
   };
 
   const handleEditTask = (task: Task) => {
     setCurrentTask(task);
-    setShowTaskForm(true);
   };
 
-  const handleDeleteTask = (id: string) => {
-    TaskService.deleteTask(id);
-    setTasks(tasks.filter((task) => task.id !== id));
+  const handleDeleteTask = async (id: string) => {
+    await TaskService.deleteTask(id);
+    if (currentStory) {
+      const tasks = await TaskService.getAllTasksByStoryId(currentStory.id);
+      setTasks(tasks);
+    }
   };
 
-  const handleUpdateTask = (task: Task) => {
-    TaskService.updateTask(task);
-    setTasks(TaskService.getAllTasks().filter((t) => t.storyId === currentStory?.id));
+  const handleUpdateTask = async (task: Task) => {
+    await TaskService.updateTask(task);
+    if (currentStory) {
+      const tasks = await TaskService.getAllTasksByStoryId(currentStory.id);
+      setTasks(tasks);
+    }
   };
 
-  const handleAssignUser = (taskId: string, userId: string) => {
-    const updatedTask = TaskService.assignUser(taskId, userId);
-    if (updatedTask.status === 'todo') {
-      updatedTask.status = 'doing';
-      TaskService.updateTask(updatedTask);
-      setTasks((prevTasks) => prevTasks.map((t) => (t.id === updatedTask.id ? updatedTask : t)));
-    } else {
-      TaskService.updateTask(updatedTask);
-      setTasks((prevTasks) => prevTasks.map((t) => (t.id === updatedTask.id ? updatedTask : t)));
+  const handleAssignUser = async (taskId: string, userId: string) => {
+    const task = await TaskService.getTaskById(taskId);
+    if (task) {
+      task.assignedUserId = userId;
+      task.status = 'doing';
+      await TaskService.updateTask(task);
+      if (currentStory) {
+        const tasks = await TaskService.getAllTasksByStoryId(currentStory.id);
+        setTasks(tasks);
+      }
     }
   };
 
@@ -97,7 +114,7 @@ const TaskPage: React.FC = () => {
       />
       {currentStory && (
         <>
-          <h2 className='my-2 text-xl font-medium leading-tight dark:text-white'>Zadania dla {currentStory.name}</h2>
+          <h2>Kanban Board for {currentStory.name}</h2>
           <Table
             tasks={tasks}
             onEdit={handleEditTask}
@@ -106,21 +123,13 @@ const TaskPage: React.FC = () => {
             onAssignUser={handleAssignUser}
             storyId={currentStory.id}
           />
-          
-          <button
-            onClick={() => setShowTaskForm(true)}
-            className="mt-4 bg-indigo-600 text-white px-4 py-2 rounded"
-          >
-            Add Task
-          </button>
-          {showTaskForm && (
-            <TaskForm
-              task={currentTask}
-              onSave={handleSaveTask}
-              storyId={currentStory.id}
-              onClose={() => setShowTaskForm(false)}
-            />
-          )}
+          <h2>Tasks for {currentStory.name}</h2>
+          <TaskForm
+            task={currentTask}
+            onSave={handleSaveTask}
+            storyId={currentStory.id}
+            onClose={() => setCurrentTask(undefined)}
+          />
         </>
       )}
     </div>

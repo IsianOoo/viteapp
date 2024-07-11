@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import ProjectService from '../services/ProjectService';
+import ProjectService, { addProject } from '../services/ProjectService';
 import { Project } from '../models/Project';
 import ProjectForm from '../components/ProjectForm';
 import ProjectList from '../components/ProjectList';
@@ -12,16 +12,31 @@ const ProjectPage: React.FC = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    setProjects(ProjectService.getAllProject());
+    const fetchProjects = async () => {
+      const projects = await ProjectService.getAllProjects();
+      setProjects(projects);
+    };
+    fetchProjects();
   }, []);
 
-  const handleSaveProject = (project: Project) => {
-    if (project.id === '') {
-      ProjectService.saveProject(project);
-    } else {
-      ProjectService.updateProject(project);
+  const handleAddProject = async (newProject: Project) => {
+    try {
+      const addedProject = await addProject(newProject);
+      const projects = await ProjectService.getAllProjects();  // Re-fetch projects to ensure updated data
+      setProjects(projects);
+    } catch (error) {
+      console.error('Error adding project:', error);
     }
-    setProjects(ProjectService.getAllProject());
+  };
+
+  const handleSaveProject = async (project: Project) => {
+    if (project.id === '') {
+      await ProjectService.saveProject(project);
+    } else {
+      await ProjectService.updateProject(project);
+    }
+    const projects = await ProjectService.getAllProjects();
+    setProjects(projects);
     setCurrentProject(undefined);
   };
 
@@ -29,21 +44,20 @@ const ProjectPage: React.FC = () => {
     setCurrentProject(project);
   };
 
-  const handleDeleteProject = (id: string) => {
-    ProjectService.deleteProject(id);
-    setProjects(ProjectService.getAllProject());
-    ActiveProjectService.clearActiveProject();
-    setCurrentProject(undefined);
+  const handleDeleteProject = async (id: string) => {
+    await ProjectService.deleteProject(id);
+    const projects = await ProjectService.getAllProjects();
+    setProjects(projects);
   };
 
   const handleSelectProject = (project: Project) => {
     ActiveProjectService.setActiveProject(project);
-    navigate(`/zadania/${project.id}`);
+    navigate(`/tasks/${project.id}`);
   };
 
   return (
     <div>
-      <ProjectForm project={currentProject} onSave={handleSaveProject} />
+      <ProjectForm onAddProject={handleAddProject} />
       <ProjectList
         projects={projects}
         onEdit={handleEditProject}

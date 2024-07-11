@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import UserService from '../services/UserService'
 import { User } from '../models/User'
+import supabase from '../lib/db/supabase'
 
 interface LoginFormProps {
 	onLogin: (user: User) => void
@@ -12,19 +13,19 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
 	const [message, setMessage] = useState('')
 
 	const handleSubmit = async (e: React.FormEvent) => {
-		e.preventDefault()
-		try {
-			const user = UserService.login(login, password)
-			if (user) {
-				onLogin(user)
-				setMessage('Login successful!')
-			} else {
-				setMessage('Invalid login credentials')
-			}
-		} catch (error) {
-			setMessage('Login failed! ' + (error as Error).message)
-		}
-	}
+    e.preventDefault()
+
+    const { data, error } = await supabase.auth.signInWithPassword({
+        email: login,
+        password: password,
+    })
+
+    if (error) {
+        setMessage('Login failed: ' + error)
+    } else {
+        setMessage('Login successfull')
+    }
+}
 
 	return (
     <>
