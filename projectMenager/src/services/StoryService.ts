@@ -22,6 +22,7 @@ static async getStoriesByProjectId(projectId: string): Promise<Story[]> {
 }
 
 static async saveStory(story: Story): Promise<void> {
+    console.log(story);
     story.id = uuidv4();
     let { error } = await supabase.from('Story').insert([story]);
     if (error) throw error;

@@ -68,6 +68,21 @@ class ProjectUserService{
     }
 }
 
+export const updateProject = async (project: Project): Promise<Project> => {
+  const { data, error } = await supabase
+    .from('Project')
+    .update({
+      name: project.name,
+      description: project.description,
+    })
+    .eq('id', project.id)
+    .single();
+  if (error) {
+    throw new Error(error.message);
+  }
+  return data as Project;
+};
+
 export const addProject = async (project: Project): Promise<Project> => {
   const { data, error } = await supabase.from('Project').insert([project]).single() // Ensure single object is returned
 

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import ProjectService, { addProject } from '../services/ProjectService';
+import ProjectService, { addProject,updateProject } from '../services/ProjectService';
 import { Project } from '../models/Project';
 import ProjectForm from '../components/ProjectForm';
 import ProjectList from '../components/ProjectList';
@@ -52,7 +52,7 @@ const ProjectPage: React.FC = () => {
 
   const handleSelectProject = (project: Project) => {
     ActiveProjectService.setActiveProject(project);
-    navigate(`/tasks/${project.id}`);
+    navigate(`/zadania/${project.id}`);
   };
 
   return (
