@@ -6,9 +6,10 @@ interface ProjectListProps{
     onEdit:(project:Project)=> void
     onDelete:(id:string)=> void
     onSelect: (project: Project) => void;
+    onUpdate: (project: Project) => void;
 }
 
-const ProjectList: React.FC<ProjectListProps> = ({projects,onEdit,onDelete,onSelect})=>{
+const ProjectList: React.FC<ProjectListProps> = ({projects,onEdit,onDelete,onSelect,onUpdate})=>{
     return(
         <div className="">
       <h2 className="my-5 font-bold uppercase">Projects</h2>

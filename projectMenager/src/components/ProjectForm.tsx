@@ -4,6 +4,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 interface ProjectFormProps {
   onAddProject: (project: Project) => void;
+  
 }
 
 const ProjectForm: React.FC<ProjectFormProps> = ({ onAddProject }) => {

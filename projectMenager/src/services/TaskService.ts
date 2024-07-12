@@ -61,24 +61,25 @@ static async getTasksByStoryId(storyId: string): Promise<Task[]> {
 }
 export const saveTask = async (task: Task): Promise<Task> => {
   console.log(task)
-   // Make sure assignedUserId is defined
-   if (!task.assignedUserId) {
-    throw new Error('assignedUserId is required');
+  
+   if (task.priority !== 'low' && !task.assignedUserId) {
+    throw new Error('assignedUserId is required for non-low priority tasks');
   }
+
 
   const { data, error } = await supabase.from('Task').insert([
     {
       id: task.id,
       name: task.name,
       description: task.description,
-      priority: task.priority,
+      priority: task.priority || 'low',
       storyId: task.storyId,
       estimatedTime: task.estimatedTime,
       status: task.status,
       createdAt: task.createdAt,
       startAt: task.startAt,
       endAt: task.endAt,
-      assignedUserId: task.assignedUserId,
+      assignedUserId: task.assignedUserId || undefined,
     },
   ]).single();
 

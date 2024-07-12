@@ -6,6 +6,7 @@ import ProjectList from '../components/ProjectList';
 import ActiveProjectService from '../services/ActiveProjectService';
 import { useNavigate } from 'react-router-dom';
 
+
 const ProjectPage: React.FC = () => {
   const [projects, setProjects] = useState<Project[]>([]);
   const [currentProject, setCurrentProject] = useState<Project | undefined>(undefined);
@@ -22,23 +23,23 @@ const ProjectPage: React.FC = () => {
   const handleAddProject = async (newProject: Project) => {
     try {
       const addedProject = await addProject(newProject);
-      const projects = await ProjectService.getAllProjects();  // Re-fetch projects to ensure updated data
+      const projects = await ProjectService.getAllProjects();  
       setProjects(projects);
     } catch (error) {
       console.error('Error adding project:', error);
     }
   };
 
-  const handleSaveProject = async (project: Project) => {
-    if (project.id === '') {
-      await ProjectService.saveProject(project);
-    } else {
-      await ProjectService.updateProject(project);
-    }
-    const projects = await ProjectService.getAllProjects();
-    setProjects(projects);
-    setCurrentProject(undefined);
-  };
+  // const handleSaveProject = async (project: Project) => {
+  //   if (project.id === '') {
+  //     await ProjectService.saveProject(project);
+  //   } else {
+  //     await ProjectService.updateProject(project);
+  //   }
+  //   const projects = await ProjectService.getAllProjects();
+  //   setProjects(projects);
+  //   setCurrentProject(undefined);
+  // };
 
   const handleEditProject = (project: Project) => {
     setCurrentProject(project);
@@ -55,6 +56,17 @@ const ProjectPage: React.FC = () => {
     navigate(`/zadania/${project.id}`);
   };
 
+  const handleUpdateProject = async (project: Project) => {
+    try {
+        await ProjectService.updateProject(project);
+        const projects = await ProjectService.getAllProjects();
+        setProjects(projects);
+        setCurrentProject(undefined);
+    } catch (error) {
+        console.error('Error updating project:', error);
+    }
+}; 
+
   return (
     <div>
       <ProjectForm onAddProject={handleAddProject} />
@@ -63,6 +75,7 @@ const ProjectPage: React.FC = () => {
         onEdit={handleEditProject}
         onDelete={handleDeleteProject}
         onSelect={handleSelectProject}
+        onUpdate={handleUpdateProject}
       />
     </div>
   );

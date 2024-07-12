@@ -15,6 +15,7 @@ const TaskPage: React.FC = () => {
   const [currentStory, setCurrentStory] = useState<Story | undefined>(undefined);
   const [tasks, setTasks] = useState<Task[]>([]);
   const [currentTask, setCurrentTask] = useState<Task | undefined>(undefined);
+  const [showTaskForm, setShowTaskForm] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchStories = async () => {
@@ -64,10 +65,12 @@ const TaskPage: React.FC = () => {
       setTasks(tasks);
     }
     setCurrentTask(undefined);
+    setShowTaskForm(false)
   };
 
   const handleEditTask = (task: Task) => {
     setCurrentTask(task);
+    setShowTaskForm(true);
   };
 
   const handleDeleteTask = async (id: string) => {

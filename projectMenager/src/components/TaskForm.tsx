@@ -17,7 +17,7 @@ const TaskForm: React.FC<TaskFormProps> = ({ task, onSave, storyId, onClose }) =
   const [priority, setPriority] = useState<'low' | 'medium' | 'high'>(task ? task.priority : 'low');
   const [estimatedTime, setEstimatedTime] = useState<number>(task ? task.estimatedTime : 0);
   const [status, setStatus] = useState<'todo' | 'doing' | 'done'>(task ? task.status : 'todo');
-  const [assignedUserId, setAssignedUserId] = useState<string>(task ? task.assignedUserId || '' : '');
+  const [assignedUserId, setAssignedUserId] = useState<string | undefined>(task ? task.assignedUserId : undefined);
   const [users, setUsers] = useState<User[]>([]);
 
   useEffect(() => {
@@ -55,7 +55,8 @@ const TaskForm: React.FC<TaskFormProps> = ({ task, onSave, storyId, onClose }) =
       createdAt,
       startAt,
       endAt,
-      assignedUserId: assignedUserId || ''
+      assignedUserId,
+      // : priority !== 'low' ? assignedUserId : undefined
     };
     try {
       await onSave(newTask);
@@ -64,7 +65,7 @@ const TaskForm: React.FC<TaskFormProps> = ({ task, onSave, storyId, onClose }) =
       setPriority('low');
       setEstimatedTime(0);
       setStatus('todo');
-      setAssignedUserId('');
+      setAssignedUserId(undefined);
     } catch (error) {
       console.error('Error adding task:', error);
     }
@@ -127,21 +128,23 @@ const TaskForm: React.FC<TaskFormProps> = ({ task, onSave, storyId, onClose }) =
               <option value="done">Done</option>
             </select>
           </div>
-          <div>
-            <label className="block text-sm font-bold mb-2">Assign User</label>
-            <select
-              value={assignedUserId}
-              onChange={(e) => setAssignedUserId(e.target.value)}
-              className="w-full p-2 border rounded"
-            >
-              <option value="">Select User</option>
-              {users.map((user) => (
-                <option key={user.id} value={user.id}>
-                  {user.firstName} {user.lastName}
-                </option>
-              ))}
-            </select>
-          </div>
+          {priority !== 'low' && (
+            <div>
+              <label className="block text-sm font-bold mb-2">Assign User</label>
+              <select
+                value={assignedUserId ||''}
+                onChange={(e) => setAssignedUserId(e.target.value)}
+                className="w-full p-2 border rounded"
+              >
+                <option value="">Select User</option>
+                {users.map((user) => (
+                  <option key={user.id} value={user.id}>
+                    {user.firstName} {user.lastName}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
           <div className="flex justify-end mt-4">
             <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded mr-2">Save</button>
             <button type="button" onClick={onClose} className="bg-gray-500 text-white px-4 py-2 rounded">Close</button>

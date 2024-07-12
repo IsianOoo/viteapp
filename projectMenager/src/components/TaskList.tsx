@@ -1,18 +1,38 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Task } from '../models/Task';
 import TaskForm from './TaskForm';
+import UserService from '../services/UserService';
 
 interface TaskListProps {
   tasks: Task[];
   onEdit: (task: Task) => void;
   onUpdate: (task: Task) => void;
   onDelete: (taskId: string) => void;
+  
   storyId: string;
 }
 
 const TaskList: React.FC<TaskListProps> = ({ tasks, onUpdate, onDelete, storyId }) => {
   const [editingTask, setEditingTask] = React.useState<Task | null>(null);
   const [showTaskForm, setShowTaskForm] = React.useState<boolean>(false);
+  const [users,setUsers] = useState<{[key:string]:string}>({})
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+        try {
+            const allUsers = await UserService.getAllUsers()
+            const userMap: { [key: string]: string } = {}
+            allUsers.forEach((user) => {
+                userMap[user.id] = `${user.firstName} ${user.lastName}`
+            })
+            setUsers(userMap)
+        } catch (error) {
+            console.error('Error fetching users:', error)
+        }
+    }
+
+    fetchUsers()
+}, [])
 
   const handleEdit = (task: Task) => {
     setEditingTask(task);
@@ -40,7 +60,7 @@ const TaskList: React.FC<TaskListProps> = ({ tasks, onUpdate, onDelete, storyId 
                 <p className='mb-4 text-base'>Priority: {task.priority}</p>
                 <p className='mb-4 text-base'>Estimated Time: {task.estimatedTime} hours</p>
                 <p className='mb-4 text-base'>Status: {task.status}</p>
-                <p className='mb-4 text-base'>Assigned User: {task.assignedUserId}</p>
+                <p className='mb-4 text-base'>Assigned User: {task.assignedUserId?users[task.assignedUserId]||'Unassigned':'Unassigned'}</p>
                 <button onClick={() => handleEdit(task)}>Edit</button>
                 <button onClick={() => onDelete(task.id)}>Delete</button>
               </div>

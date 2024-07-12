@@ -9,7 +9,7 @@ export interface Task{
     createdAt:string
     startAt?:string
     endAt?:string
-    assignedUserId?:string
+    assignedUserId?:string 
     
 
 }
