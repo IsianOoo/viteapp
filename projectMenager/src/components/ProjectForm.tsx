@@ -4,15 +4,33 @@ import { v4 as uuidv4 } from 'uuid';
 
 interface ProjectFormProps {
   onAddProject: (project: Project) => void;
-  
+  onUpdateProject: (project: Project) => void;
+  currentProject?: Project;
 }
 
-const ProjectForm: React.FC<ProjectFormProps> = ({ onAddProject }) => {
+const ProjectForm: React.FC<ProjectFormProps> = ({ onAddProject, onUpdateProject, currentProject }) => {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
 
+  useEffect(() => {
+    if (currentProject) {
+      setName(currentProject.name);
+      setDescription(currentProject.description);
+    }
+  }, [currentProject]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (currentProject) {
+      const updatedProject: Project = { ...currentProject, name, description };
+      try {
+        await onUpdateProject(updatedProject);
+        setName('');
+        setDescription('');
+      } catch (error) {
+        console.error('Error updating project:', error);
+      }
+  }else {
     const newProject: Project = { id: uuidv4(), name, description };
     try {
       await onAddProject(newProject);
@@ -21,13 +39,14 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ onAddProject }) => {
     } catch (error) {
       console.error('Error adding project:', error);
     }
+  }
   };
 
   return (
     <>
       <form onSubmit={handleSubmit}>
         <div className='block rounded-lg bg-gray-900 p-6 text-surface shadow-secondary-1 dark:bg-surface-dark dark:text-white mt-5'>
-          <h5 className="mb-2 text-xl font-medium leading-tight">Stwórz Projekt</h5>
+          <h5 className="mb-2 text-xl font-medium leading-tight">{currentProject ? 'Edytuj Projekt' : 'Stwórz Projekt'}</h5>
           <div>
             <label className='block text-sm font-medium leading-6'>Name</label>
             <input

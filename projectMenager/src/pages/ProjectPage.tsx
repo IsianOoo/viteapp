@@ -30,17 +30,6 @@ const ProjectPage: React.FC = () => {
     }
   };
 
-  // const handleSaveProject = async (project: Project) => {
-  //   if (project.id === '') {
-  //     await ProjectService.saveProject(project);
-  //   } else {
-  //     await ProjectService.updateProject(project);
-  //   }
-  //   const projects = await ProjectService.getAllProjects();
-  //   setProjects(projects);
-  //   setCurrentProject(undefined);
-  // };
-
   const handleEditProject = (project: Project) => {
     setCurrentProject(project);
   };
@@ -56,26 +45,28 @@ const ProjectPage: React.FC = () => {
     navigate(`/zadania/${project.id}`);
   };
 
-  const handleUpdateProject = async (project: Project) => {
+  const handleUpdateProject = async (updatedProject: Project) => {
     try {
-        await ProjectService.updateProject(project);
-        const projects = await ProjectService.getAllProjects();
-        setProjects(projects);
-        setCurrentProject(undefined);
+      await updateProject(updatedProject);
+      const updatedProjects = projects.map((project) =>
+        project.id === updatedProject.id ? updatedProject : project
+      );
+      setProjects(updatedProjects);
+      setCurrentProject(undefined);
     } catch (error) {
-        console.error('Error updating project:', error);
+      console.error('Error updating project:', error);
     }
-}; 
+  }; 
 
   return (
     <div>
-      <ProjectForm onAddProject={handleAddProject} />
+      <ProjectForm onAddProject={handleAddProject} onUpdateProject={handleUpdateProject} currentProject={currentProject} />
       <ProjectList
         projects={projects}
         onEdit={handleEditProject}
         onDelete={handleDeleteProject}
         onSelect={handleSelectProject}
-        onUpdate={handleUpdateProject}
+        
       />
     </div>
   );
