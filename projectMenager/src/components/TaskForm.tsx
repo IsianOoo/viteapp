@@ -2,12 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { Task } from '../models/Task';
 import UserService from '../services/UserService';
 import { User } from '../models/User';
+import { v4 as uuidv4 } from 'uuid';
 
 interface TaskFormProps {
   task?: Task;
   onSave: (task: Task) => void;
   storyId: string;
-  onClose: () => void; // Dodaj tę właściwość
+  onClose: () => void;
 }
 
 const TaskForm: React.FC<TaskFormProps> = ({ task, onSave, storyId, onClose }) => {
@@ -16,14 +17,18 @@ const TaskForm: React.FC<TaskFormProps> = ({ task, onSave, storyId, onClose }) =
   const [priority, setPriority] = useState<'low' | 'medium' | 'high'>(task ? task.priority : 'low');
   const [estimatedTime, setEstimatedTime] = useState<number>(task ? task.estimatedTime : 0);
   const [status, setStatus] = useState<'todo' | 'doing' | 'done'>(task ? task.status : 'todo');
-  const [assignedUserId, setAssignedUserId] = useState<string | undefined>(task ? task.assignedUserId : undefined);
+  const [assignedUserId, setAssignedUserId] = useState<string>(task ? task.assignedUserId || '' : '');
   const [users, setUsers] = useState<User[]>([]);
 
   useEffect(() => {
     const fetchUsers = async () => {
-      const allUsers = UserService.getAllUsers();
-      const filteredUsers = allUsers.filter((user) => user.role !== 'admin');
-      setUsers(filteredUsers);
+      try {
+        const allUsers = await UserService.getAllUsers(); 
+        const nonAdminUsers = allUsers.filter(user => user.role !== 'admin'); 
+        setUsers(nonAdminUsers);
+      } catch (error) {
+        console.error('Error fetching users:', error);
+      }
     };
     fetchUsers();
   }, []);
@@ -34,36 +39,35 @@ const TaskForm: React.FC<TaskFormProps> = ({ task, onSave, storyId, onClose }) =
     }
   }, [assignedUserId]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    if (assignedUserId && status === 'doing') {
-      setStatus('done');
-    }
-
-    const updatedTask: Task = {
-      id: task ? task.id : '',
+    const createdAt = new Date().toISOString();
+    const startAt = new Date().toISOString();
+    const endAt = new Date().toISOString();
+    const newTask: Task = {
+      id: uuidv4(),
       name,
       description,
       priority,
       storyId,
       estimatedTime,
       status,
-      createdAt: task ? task.createdAt : '',
-      startAt: task ? task.startAt : undefined,
-      endAt: task ? task.endAt : undefined,
-      assignedUserId,
+      createdAt,
+      startAt,
+      endAt,
+      assignedUserId: assignedUserId || ''
     };
-
-    onSave(updatedTask);
-
-    setName('');
-    setDescription('');
-    setPriority('low');
-    setEstimatedTime(0);
-    setStatus('todo');
-    setAssignedUserId(undefined);
-    onClose(); 
+    try {
+      await onSave(newTask);
+      setName('');
+      setDescription('');
+      setPriority('low');
+      setEstimatedTime(0);
+      setStatus('todo');
+      setAssignedUserId('');
+    } catch (error) {
+      console.error('Error adding task:', error);
+    }
   };
 
   return (
@@ -126,7 +130,7 @@ const TaskForm: React.FC<TaskFormProps> = ({ task, onSave, storyId, onClose }) =
           <div>
             <label className="block text-sm font-bold mb-2">Assign User</label>
             <select
-              value={assignedUserId || ''}
+              value={assignedUserId}
               onChange={(e) => setAssignedUserId(e.target.value)}
               className="w-full p-2 border rounded"
             >

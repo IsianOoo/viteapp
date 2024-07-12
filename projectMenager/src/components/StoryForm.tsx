@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Story } from '../models/Story';
 import UserService from '../services/UserService';
+import {v4 as uuidv4} from 'uuid';
+import { jwtDecode } from 'jwt-decode';
 
 interface StoryFormProps {
   story?: Story;
@@ -14,21 +16,29 @@ const StoryForm: React.FC<StoryFormProps> = ({ story, onSave, projectId }) => {
   const [priority, setPriority] = useState<'low' | 'medium' | 'high'>(story ? story.priority : 'low');
   const [status, setStatus] = useState<'todo' | 'doing' | 'done'>(story ? story.status : 'todo');
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    const loggedInUser = UserService.getLoggedInUser();
-    if (loggedInUser) {
-      onSave({
-        id: story ? story.id : '',
-        name,
-        description,
-        priority,
-        projectId,
-        createdAt: story ? story.createdAt : new Date().toISOString(),
-        status,
-        ownerId: loggedInUser.id
-      });
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    const token = localStorage.getItem('token')
+    if(!token){
+      console.error('nie ma tokenu')
+      return
     }
+    const decodedToken:{id:string} = jwtDecode(token)
+    const ownerId = decodedToken.id
+    
+
+        const createdAt = new Date().toISOString()
+        
+        const newStory: Story = { id: uuidv4(), name, description, priority, projectId, status, createdAt,ownerId}
+        try {
+            await onSave(newStory)
+            setName('')
+            setDescription('')
+            setPriority('low')
+            setStatus('todo')
+        } catch (error) {
+            console.error('Error adding story:', error)
+        }
     setName('');
     setDescription('');
     setPriority('low');

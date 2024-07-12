@@ -63,7 +63,7 @@ export type Database = {
             foreignKeyName: "Story_ownerId_fkey"
             columns: ["ownerId"]
             isOneToOne: false
-            referencedRelation: "users"
+            referencedRelation: "User"
             referencedColumns: ["id"]
           },
           {
@@ -77,7 +77,7 @@ export type Database = {
       }
       Task: {
         Row: {
-          assignedUserId: string
+          assignedUserId: string | null
           createdAt: string | null
           description: string
           endAt: string | null
@@ -90,7 +90,7 @@ export type Database = {
           storyId: string
         }
         Insert: {
-          assignedUserId?: string
+          assignedUserId?: string | null
           createdAt?: string | null
           description: string
           endAt?: string | null
@@ -100,10 +100,10 @@ export type Database = {
           priority: Database["public"]["Enums"]["priority"]
           startAt?: string | null
           status: Database["public"]["Enums"]["status"]
-          storyId?: string
+          storyId: string
         }
         Update: {
-          assignedUserId?: string
+          assignedUserId?: string | null
           createdAt?: string | null
           description?: string
           endAt?: string | null
@@ -120,7 +120,7 @@ export type Database = {
             foreignKeyName: "Task_assignedUserId_fkey"
             columns: ["assignedUserId"]
             isOneToOne: false
-            referencedRelation: "users"
+            referencedRelation: "User"
             referencedColumns: ["id"]
           },
           {

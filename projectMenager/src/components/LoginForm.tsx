@@ -4,7 +4,7 @@ import { User } from '../models/User'
 import supabase from '../lib/db/supabase'
 
 interface LoginFormProps {
-	onLogin: (user: User) => void
+	onLogin: () => void
 }
 
 const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
@@ -14,18 +14,46 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
 
 	const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    try {
+      const response = await fetch('http://localhost:3000/login', {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ login, password }),
+      });
+      const data = await response.json();
+      if (response.ok) {
+          localStorage.setItem('token', data.token);
+          localStorage.setItem('refreshToken', data.refreshToken);
+          setMessage('Login successful');
+          onLogin()
+           
+      } else {
+          setMessage('Login failed: ' + data.message);
+          console.log(data);
+      }
+  } catch (error) {
+      console.log(error);
+      setMessage('Login failed:error ');
+      
+  }
 
-    const { data, error } = await supabase.auth.signInWithPassword({
-        email: login,
-        password: password,
-    })
 
-    if (error) {
-        setMessage('Login failed: ' + error)
-    } else {
-        setMessage('Login successfull')
-    }
-}
+
+
+  }
+    // const { data, error } = await supabase.auth.signInWithPassword({
+    //     email: login,
+    //     password: password,
+    // })
+
+    // if (error) {
+    //     setMessage('Login failed: ' + error)
+    // } else {
+    //     setMessage('Login successfull')
+    // }
+
 
 	return (
     <>

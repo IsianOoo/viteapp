@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import StoryService from '../services/StoryService';
-import TaskService from '../services/TaskService';
+import StoryService, { addStory } from '../services/StoryService';
+import TaskService, { saveTask } from '../services/TaskService';
 import { Story } from '../models/Story';
 import { Task } from '../models/Task';
 import StoryForm from '../components/StoryForm';
@@ -27,16 +27,13 @@ const TaskPage: React.FC = () => {
   }, [projectId]);
 
   const handleSaveStory = async (story: Story) => {
-    if (story.id === '') {
-      await StoryService.saveStory(story);
-    } else {
-      await StoryService.updateStory(story);
-    }
     if (projectId) {
+      const addedStory = await addStory(story);
       const stories = await StoryService.getStoriesByProjectId(projectId);
       setStories(stories);
+    } else {
+      console.error('Error adding story:');
     }
-    setCurrentStory(undefined);
   };
 
   const handleEditStory = (story: Story) => {
@@ -51,20 +48,19 @@ const TaskPage: React.FC = () => {
     }
   };
 
-  const handleSelectStory = async (story: Story) => {
+  const handleSelectStory = (story: Story) => {
     setCurrentStory(story);
-    const tasks = await TaskService.getAllTasksByStoryId(story.id);
-    setTasks(tasks);
+    const fetchTasks = async () => {
+      const tasks = await TaskService.getTasksByStoryId(story.id);
+      setTasks(tasks);
+    };
+    fetchTasks();
   };
 
   const handleSaveTask = async (task: Task) => {
-    if (task.id === '') {
-      await TaskService.saveTask(task);
-    } else {
-      await TaskService.updateTask(task);
-    }
+    await saveTask(task);
     if (currentStory) {
-      const tasks = await TaskService.getAllTasksByStoryId(currentStory.id);
+      const tasks = await TaskService.getTasksByStoryId(currentStory.id);
       setTasks(tasks);
     }
     setCurrentTask(undefined);
@@ -77,59 +73,20 @@ const TaskPage: React.FC = () => {
   const handleDeleteTask = async (id: string) => {
     await TaskService.deleteTask(id);
     if (currentStory) {
-      const tasks = await TaskService.getAllTasksByStoryId(currentStory.id);
+      const tasks = await TaskService.getTasksByStoryId(currentStory.id);
       setTasks(tasks);
-    }
-  };
-
-  const handleUpdateTask = async (task: Task) => {
-    await TaskService.updateTask(task);
-    if (currentStory) {
-      const tasks = await TaskService.getAllTasksByStoryId(currentStory.id);
-      setTasks(tasks);
-    }
-  };
-
-  const handleAssignUser = async (taskId: string, userId: string) => {
-    const task = await TaskService.getTaskById(taskId);
-    if (task) {
-      task.assignedUserId = userId;
-      task.status = 'doing';
-      await TaskService.updateTask(task);
-      if (currentStory) {
-        const tasks = await TaskService.getAllTasksByStoryId(currentStory.id);
-        setTasks(tasks);
-      }
     }
   };
 
   return (
     <div>
       <StoryForm story={currentStory} onSave={handleSaveStory} projectId={projectId!} />
-      <StoryList
-        stories={stories}
-        onEdit={handleEditStory}
-        onDelete={handleDeleteStory}
-        onSelect={handleSelectStory}
-      />
+      <StoryList stories={stories} onEdit={handleEditStory} onDelete={handleDeleteStory} onSelect={handleSelectStory} />
       {currentStory && (
         <>
-          <h2>Kanban Board for {currentStory.name}</h2>
-          <Table
-            tasks={tasks}
-            onEdit={handleEditTask}
-            onDelete={handleDeleteTask}
-            onUpdate={handleUpdateTask}
-            onAssignUser={handleAssignUser}
-            storyId={currentStory.id}
-          />
-          <h2>Tasks for {currentStory.name}</h2>
-          <TaskForm
-            task={currentTask}
-            onSave={handleSaveTask}
-            storyId={currentStory.id}
-            onClose={() => setCurrentTask(undefined)}
-          />
+          <Table tasks={tasks} onEdit={handleEditTask} onDelete={handleDeleteTask} onUpdate={handleSaveTask} storyId={currentStory.id} />
+          <button onClick={() => setCurrentTask({} as Task)} className="bg-blue-500 text-white px-4 py-2 rounded mt-4">Add Task</button>
+          {currentTask && <TaskForm task={currentTask} onSave={handleSaveTask} storyId={currentStory.id} onClose={() => setCurrentTask(undefined)} />}
         </>
       )}
     </div>

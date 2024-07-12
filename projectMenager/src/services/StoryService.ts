@@ -22,10 +22,11 @@ static async getStoriesByProjectId(projectId: string): Promise<Story[]> {
 }
 
 static async saveStory(story: Story): Promise<void> {
-    console.log(story);
+    
     story.id = uuidv4();
     let { error } = await supabase.from('Story').insert([story]);
     if (error) throw error;
+    
 }
 
 static async updateStory(story: Story): Promise<void> {
@@ -37,6 +38,17 @@ static async deleteStory(id: string): Promise<void> {
     let { error } = await supabase.from('Story').delete().eq('id', id);
     if (error) throw error;
 }
+}
+
+export const addStory = async (story: Story): Promise<Story> => {
+    const { data, error } = await supabase.from('Story').insert([story]).single()
+
+    if (error) {
+        console.error('Error adding story:', error)
+        throw error
+    }
+
+    return data
 }
 
 export default StoryService

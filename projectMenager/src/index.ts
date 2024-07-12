@@ -3,12 +3,14 @@ import jwt from 'jsonwebtoken'
 import 'dotenv/config'
 import cors from 'cors'
 import UserService from './services/UserService'
+import supabase from './lib/db/supabase'
 
 const app = express()
 const port = 3000
 
 const tokenSecret = process.env.TOKEN_SECRET as string
 let refreshTokenStore: { [key: string]: string } = {}
+const refreshTokenSecret = process.env.REFRESH_TOKEN_SECRET as string;
 
 app.use(cors())
 app.use(express.json())
@@ -17,19 +19,7 @@ app.get('/', (req, res) => {
 	res.send('Hello World - simple api with JWT!')
 })
 
-app.post('/login', (req, res) => {
-	const { login, password } = req.body
-	const user = UserService.login(login, password)
-	if (user) {
-		const userId = user.id
-		const token = generateToken(60, userId)
-		const refreshToken = generateToken(60 * 60, userId)
-		refreshTokenStore[userId] = refreshToken
-		res.status(200).send({ token, refreshToken })
-	} else {
-		res.status(401).send('Invalid login or password')
-	}
-})
+
 
 app.post('/token', (req, res) => {
 	const expTime = req.body.exp || 60

@@ -9,32 +9,33 @@ import Navbar from './components/Navbar'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import ProjectPage from './pages/ProjectPage'
 import TaskPage from './pages/TaskPage'
-import { Session } from '@supabase/supabase-js'
+
 import supabase from './lib/db/supabase'
 
 const App: React.FC = () => {
-	const [session, setSession] = useState<Session | null>(null)
-
+	
+	const [isLogin,setIsLogin] = useState(false)
+ 
 	useEffect(() => {
-		supabase.auth.getSession().then(({ data: { session } }) => {
-			setSession(session)
-		})
+		
+		const check = localStorage.getItem('token')
+		if(check){
+			setIsLogin(true)
+		}else{
+			setIsLogin(false)
+		}
 
-		const {
-			data: { subscription },
-		} = supabase.auth.onAuthStateChange((_event, session) => {
-			setSession(session)
-		})
-
-		return () => subscription.unsubscribe()
+		
 	}, [])
 
-	if (!session) {
-		return <LoginForm />
+	if (!isLogin) {
+		return <LoginForm onLogin={()=>setIsLogin(true)} />
 	}
 
 	async function signOut() {
-		const { error } = await supabase.auth.signOut()
+		localStorage.removeItem('token')
+		localStorage.removeItem('refreshToken')
+		setIsLogin(false)
 	}
 
 	return (

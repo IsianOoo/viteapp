@@ -7,7 +7,7 @@ interface TableProps {
   onEdit: (task: Task) => void
   onDelete: (taskId: string) => void
   onUpdate: (task: Task) => void
-  onAssignUser: (taskId: string, userId: string) => void
+  
   storyId: string
 }
 
