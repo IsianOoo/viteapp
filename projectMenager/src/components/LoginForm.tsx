@@ -43,17 +43,6 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
 
 
   }
-    // const { data, error } = await supabase.auth.signInWithPassword({
-    //     email: login,
-    //     password: password,
-    // })
-
-    // if (error) {
-    //     setMessage('Login failed: ' + error)
-    // } else {
-    //     setMessage('Login successfull')
-    // }
-
 
 	return (
     <>
@@ -89,18 +78,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
 
   
 </div>
-      {/* <form onSubmit={handleSubmit}>
-      <div>
-        <label>Login</label>
-        <input type='text' value={login} onChange={(e) => setLogin(e.target.value)} required />
-      </div>
-      <div>
-        <label>Password</label>
-        <input type='password' value={password} onChange={(e) => setPassword(e.target.value)} required />
-      </div>
-      <button type='submit'>Login</button>
-    </form>
-    {message && <p>{message}</p>} */}
+     
     </div>
     
   </div></>
